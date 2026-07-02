@@ -26,8 +26,8 @@ defmodule AshEvents.MixProject do
       source_url: "https://github.com/ash-project/ash_events",
       homepage_url: "https://github.com/ash-project/ash_events",
       dialyzer: [
-        plt_add_apps: [:mix]
-      ]
+        plt_add_apps: [:mix],
+      ],
     ]
   end
 
@@ -42,8 +42,8 @@ defmodule AshEvents.MixProject do
         "test.drop": :test,
         "test.generate_migrations": :test,
         "test.reset": :test,
-        tidewave: :test
-      ]
+        tidewave: :test,
+      ],
     ]
   end
 
@@ -66,20 +66,21 @@ defmodule AshEvents.MixProject do
   defp application(:test) do
     [
       mod: {AshEvents.TestApp, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger],
     ]
   end
 
   defp application(_) do
     [
-      extra_applications: [:logger]
+      mod: {AshEvents.Application, []},
+      extra_applications: [:logger],
     ]
   end
 
   defp package do
     [
       maintainers: [
-        "Torkild Kjevik <torkild.kjevik@boitano.no>"
+        "Torkild Kjevik <torkild.kjevik@boitano.no>",
       ],
       licenses: ["MIT"],
       files: ~w(lib .formatter.exs mix.exs README*
@@ -90,8 +91,8 @@ defmodule AshEvents.MixProject do
         "Discord" => "https://discord.gg/HTHRaaVPUc",
         "Website" => "https://ash-hq.org",
         "Forum" => "https://elixirforum.com/c/elixir-framework-forums/ash-framework-forum",
-        "REUSE Compliance" => "https://api.reuse.software/info/github.com/ash-project/ash_events"
-      }
+        "REUSE Compliance" => "https://api.reuse.software/info/github.com/ash-project/ash_events",
+      },
     ]
   end
 
@@ -107,7 +108,7 @@ defmodule AshEvents.MixProject do
          search_data: Spark.Docs.search_data_for(AshEvents.EventLog)},
         {"documentation/dsls/DSL-AshEvents.Events.md",
          search_data: Spark.Docs.search_data_for(AshEvents.Events)},
-        "CHANGELOG.md"
+        "CHANGELOG.md",
       ],
       groups_for_extras: [
         Tutorials: ~r'documentation/tutorials',
@@ -115,8 +116,8 @@ defmodule AshEvents.MixProject do
         Topics: ~r'documentation/topics',
         DSLs: ~r'documentation/dsls',
         "About AshEvents": [
-          "CHANGELOG.md"
-        ]
+          "CHANGELOG.md",
+        ],
       ],
       before_closing_head_tag: fn type ->
         if type == :html do
@@ -132,7 +133,7 @@ defmodule AshEvents.MixProject do
           </script>
           """
         end
-      end
+      end,
     ]
   end
 
@@ -159,7 +160,7 @@ defmodule AshEvents.MixProject do
       {:ash_state_machine, "~> 0.2", only: [:dev, :test]},
       {:ash_phoenix, "~> 2.0", only: [:dev, :test]},
       {:bandit, "~> 1.0", only: [:dev, :test]},
-      {:tidewave, ">= 0.5.0", only: [:dev, :test]}
+      {:tidewave, ">= 0.5.0", only: [:dev, :test]},
     ]
   end
 
@@ -179,11 +180,11 @@ defmodule AshEvents.MixProject do
       docs: [
         "spark.cheat_sheets",
         "docs",
-        "spark.replace_doc_links"
+        "spark.replace_doc_links",
       ],
       credo: "credo --strict",
       "spark.formatter": "spark.formatter --extensions AshEvents.EventLog,AshEvents.Events",
-      "spark.cheat_sheets": "spark.cheat_sheets --extensions AshEvents.EventLog,AshEvents.Events"
+      "spark.cheat_sheets": "spark.cheat_sheets --extensions AshEvents.EventLog,AshEvents.Events",
     ]
   end
 end
