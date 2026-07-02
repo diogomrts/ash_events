@@ -23,7 +23,7 @@ defmodule AshEvents.Application do
   @wrappers [
     AshEvents.CreateActionWrapper,
     AshEvents.UpdateActionWrapper,
-    AshEvents.DestroyActionWrapper,
+    AshEvents.DestroyActionWrapper
   ]
 
   @impl true

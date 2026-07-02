@@ -359,4 +359,58 @@ defmodule AshEvents.BulkActionsTest do
 
     assert Enum.count(events) == 1
   end
+
+  test "the application eagerly loads the manual action wrappers" do
+    # AshEvents.Application.start/2 must load the wrappers so Ash's bulk
+    # pipeline sees the DestroyActionWrapper.bulk_update/3 callback via
+    # function_exported?/3 (which does not auto-load modules).
+    for mod <- [
+          AshEvents.CreateActionWrapper,
+          AshEvents.UpdateActionWrapper,
+          AshEvents.DestroyActionWrapper
+        ] do
+      assert Code.loaded?(mod), "expected #{inspect(mod)} to be loaded"
+    end
+
+    assert function_exported?(AshEvents.DestroyActionWrapper, :bulk_update, 3)
+  end
+
+  test "bulk_destroy with soft delete works when the wrapper starts unloaded" do
+    alias AshEvents.Accounts.Article
+
+    # Regression: previously the DestroyActionWrapper was only loaded lazily on
+    # first use. Ash's bulk pipeline gates the batch path on
+    # function_exported?(mod, :bulk_update, 3), which returns false for an
+    # unloaded module, so it took the single-record fallback and read the
+    # :bulk_update context key a soft-delete (:bulk_destroy) never sets ->
+    # BadMapError. Simulate that cold-start state by purging the module.
+    :code.purge(AshEvents.DestroyActionWrapper)
+    :code.delete(AshEvents.DestroyActionWrapper)
+    refute Code.loaded?(AshEvents.DestroyActionWrapper)
+
+    # Re-run the eager-load hook the application performs on start.
+    AshEvents.Application.ensure_wrappers_loaded()
+
+    articles =
+      1..3
+      |> Enum.map(fn i ->
+        Accounts.create_article!(
+          %{title: "Article #{i}", body: "Body #{i}"},
+          actor: %SystemActor{name: "system"}
+        )
+      end)
+
+    result =
+      articles
+      |> Ash.bulk_destroy!(:soft_destroy, %{},
+        resource: Article,
+        return_errors?: true,
+        return_records?: true,
+        strategy: :stream,
+        actor: %SystemActor{name: "system"}
+      )
+
+    assert result.error_count == 0
+    assert Enum.count(result.records) == 3
+  end
 end
